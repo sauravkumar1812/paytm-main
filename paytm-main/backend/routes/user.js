@@ -3,28 +3,81 @@ const JWT_SECRET = require("../config");
 const zod = require("zod");
 const jwt = require("jsonwebtoken");
 const router = express.Router();
-const { User } = require(".../db");
+const { User,Account} = require(".../db");
 const { authMiddleware } = require("../middleware");
 
 // zod schema for the incoming body
-const signupSchema = zod.object({
-  username: zod.string(),
+const signupBody = zod.object({
+  username: zod.string().email(),
   password: zod.string(),
   firstName: zod.string(),
   lastName: zod.string(),
 });
-// signup end point
+
 router.post("/signup", async (req, res) => {
+    const { success } = signupBody.safeParse(req.body)
+    if (!success) {
+        return res.status(411).json({
+            message: "Email already taken / Incorrect inputs"
+        })
+    }
+
+    const existingUser = await User.findOne({
+        username: req.body.username
+    })
+
+    if (existingUser) {
+        return res.status(411).json({
+            message: "Email already taken/Incorrect inputs"
+        })
+    }
+
+    const user = await User.create({
+        username: req.body.username,
+        password: req.body.password,
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+    })
+    const userId = user._id;
+
+		/// ----- Create new account ------
+
+    await Account.create({
+        userId,
+        balance: 1 + Math.random() * 10000
+    })
+
+		/// -----  ------
+
+    const token = jwt.sign({
+        userId
+    }, JWT_SECRET);
+
+    res.json({
+        message: "User created successfully",
+        token: token
+    })
+})
+
+// signin end point
+
+const signinBody = zod.object({
+    username: zod.string().email(),
+	password: zod.string()
+})
+
+router.post("/signin", async (req, res) => {
   const body = req.body;
-  const { success } = signupSchema.safeParse(req.body);
+  const { success } = signinBody.safeParse(req.body);
   if (!success) {
     return res.json({
       message: "Email already taken / Inccorect Inputs",
     });
   }
 
-  const user = User.findOnde({
-    username: body.username,
+  const user = await User.findOne({
+    username: req.body.username,
+    password: req.body.password,
   });
   if (user._id) {
     return res.json({
