@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 
 //  Data Base created
+mongoose.connect("mongodb://localhost:27017/paytm")
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
