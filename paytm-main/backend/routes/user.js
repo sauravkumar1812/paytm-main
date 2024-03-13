@@ -79,23 +79,22 @@ router.post("/signin", async (req, res) => {
     username: req.body.username,
     password: req.body.password,
   });
-  if (user._id) {
-    return res.json({
-      message: "Email already taken / Inccorect Inputs",
-    });
-  }
-  const dbuser = await User.Create(body);
-  const token = jwt.sign(
-    {
-      userId: dbuser._id,
-    },
-    JWT_SECRET
-  );
-  res.json({
-    message: "User Created successfully",
-    token: token,
-  });
-});
+  if (user) {
+    const token = jwt.sign({
+        userId: user._id
+    }, JWT_SECRET);
+
+    res.json({
+        token: token
+    })
+    return;
+}
+
+
+res.status(411).json({
+    message: "Error while logging in"
+})
+})
 
 const updateBody = zod.object({
   password: zod.string().optional(),
