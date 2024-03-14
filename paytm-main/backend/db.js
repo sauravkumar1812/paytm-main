@@ -50,3 +50,4 @@ module.exports = {
     user,
     Account,
 };
+router.use(express.json())
