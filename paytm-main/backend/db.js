@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 
 //  Data Base created
-mongoose.connect("mongodb://localhost:27017/paytm")
+mongoose.connect("mongodb://localhost:27017")
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
@@ -18,17 +18,17 @@ const userSchema = new mongoose.Schema({
     required: true,
     minLength: 6,
   },
-  firstname: {
+  firstName: {
     type: String,
     required: true,
     trim: true,
-    minLength: 50,
+    minLength: 3,
   },
-  lastname: {
+  lastName: {
     type: String,
     required: true,
     trim: true,
-    minLength: 50,
+    minLength: 3,
   },
 });
 
@@ -44,10 +44,10 @@ const accountSchema = new mongoose.Schema({
   }
 });
 const Account = mongoose.model('Account',accountSchema)
-const user = mongoose.model('user',userSchema);
+const User = mongoose.model('user',userSchema);
 
 module.exports = {
-    user,
+    User,
     Account,
 };
-router.use(express.json())
+// router.use(express.json())

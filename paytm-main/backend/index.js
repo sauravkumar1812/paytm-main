@@ -9,4 +9,7 @@ app.use(express.json());
 
 app.use("/api/v1", mainRouter);
 
-app.listen(4980);
+app.listen(4981,()=>
+{
+    console.log("server start");
+});
