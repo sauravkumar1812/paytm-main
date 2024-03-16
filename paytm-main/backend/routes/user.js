@@ -164,6 +164,7 @@ const signupBody = zod.object({
 })
 
 router.post("/signup", async (req, res) => {
+    console.log(req.body);
     const { success } = signupBody.safeParse(req.body)
     if (!success) {
         return res.status(411).json({
@@ -187,7 +188,7 @@ router.post("/signup", async (req, res) => {
         firstName: req.body.firstName,
         lastName: req.body.lastName,
     })
-    const userId= req.body;
+    const userId= user._id;
 
     await Account.create({
         userId,
@@ -247,12 +248,19 @@ const updateBody = zod.object({
 })
 
 router.put("/", authMiddleware, async (req, res) => {
-    const { success } = updateBody.safeParse(req.body)
+    // const { success } = updateBody.safeParse(req.body)
+    const { success, error } = signupBody.safeParse(req.body)
+console.log("Checking error : ", error );
     if (!success) {
-        res.status(411).json({
-            message: "Error while updating information"
+        return res.status(411).json({
+            message: "couldn't sign"
         })
     }
+    // if (!success) {
+    //     res.status(411).json({
+    //         message: "Error while updating information"
+    //     })
+    // }
 
     await User.updateOne(req.body, {
         id: req.userId
